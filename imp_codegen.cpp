@@ -122,11 +122,31 @@ void ImpCodeGen::visit(FunDec* fd) {
   int m = fd->types.size();
   VarEntry ventry;
 
-  // agregar direcciones de argumentos
+    // MODIFICADO
 
+  // agregar direcciones de argumentos
+  for (int i = 0; i < m; i++) {
+    current_dir++;
+    ventry.dir = current_dir;
+    ventry.is_global = false;
+    auto it = fd->vars.begin();
+    advance(it, i);
+    direcciones.add_var(*it, ventry);
+    
+  }
   // agregar direccion de return
+  current_dir++;
+  ventry.dir = current_dir;
+  ventry.is_global = false;
+  direcciones.add_var("return", ventry);
 
   // generar codigo para fundec
+  // MODIFICADO
+  codegen(get_flabel(fd->fname),"skip");
+  codegen(nolabel,"enter",current_dir);
+  codegen(nolabel,"alloc",current_dir);
+  codegen(nolabel,"mark");
+
 
   num_params = m;
 

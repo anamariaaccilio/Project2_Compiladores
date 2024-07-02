@@ -42,6 +42,7 @@ void ImpTypeChecker::visit(Program* p) {
   if (!funtype.match(maintype)) {
     cout << "Tipo incorrecto de main: " << funtype << endl;
     exit(0);
+    
   }
 
   env.remove_level();
@@ -125,7 +126,16 @@ void ImpTypeChecker::visit(VarDec* vd) {
   list<string>::iterator it;
   for (it = vd->vars.begin(); it != vd->vars.end(); ++it) {
     env.add_var(*it, type);
-    // actualizar dir y max_dir
+    // MODIFICADO
+    sp_incr(1);
+    if (sp > max_dir) max_dir = sp;
+    else if (sp < 0) {
+      cout << "stack less than 0" << endl;
+      exit(0);
+    }
+    else
+      sp_decr(1);
+
   }   
   return;
 }
@@ -176,6 +186,7 @@ void ImpTypeChecker::visit(AssignStatement* s) {
 void ImpTypeChecker::visit(PrintStatement* s) {
   s->e->accept(this);
   // que hacer con sp?
+
   return;
 }
 
@@ -244,7 +255,9 @@ ImpType ImpTypeChecker::visit(BinaryExp* e) {
 }
 
 ImpType ImpTypeChecker::visit(NumberExp* e) {
+
   // que hacer con sp?
+
   return inttype;
 }
 
@@ -254,13 +267,13 @@ ImpType ImpTypeChecker::visit(TrueFalseExp* e) {
 }
 
 ImpType ImpTypeChecker::visit(IdExp* e) {
-  // que hacer con sp?
-  if (env.check(e->id))
-    return env.lookup(e->id);
-  else {
-    cout << "Variable indefinida: " << e->id << endl;
+  if (!env.check(e->id)) {
+    cout << "Variable " << e->id << " no definida" << endl;
     exit(0);
   }
+  // que hacer con sp?
+  return env.lookup(e->id);
+  
 }
 
 ImpType ImpTypeChecker::visit(ParenthExp* ep) {
@@ -301,9 +314,13 @@ ImpType ImpTypeChecker::visit(FCallExp* e) {
 
   // que hacer con sp y el valor de retorno?
   
+  // MDOIFICADO
   if (num_fun_args != num_fcall_args) {
     cout << "(Function call) Numero de argumentos no corresponde a declaracion de: " << e->fname << endl;
     exit(0);
+  }
+  else if (num_fun_args == 0) {
+    return rtype;
   }
   ImpType argtype;
   list<Exp*>::iterator it;
