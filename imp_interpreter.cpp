@@ -131,6 +131,44 @@ void ImpInterpreter::visit(WhileStatement* s) {
  return;
 }
 
+void ImpInterpreter::visit(ForDoStatement* s) {
+    // Evaluar las expresiones de inicio y fin del rango
+    ImpValue startVal = s->e1->accept(this);
+    ImpValue endVal = s->e2->accept(this);
+
+    // Verificar que las expresiones sean de tipo int
+    if (startVal.type != TINT || endVal.type != TINT) {
+        cout << "Error de tipos: las expresiones de rango en For deben ser enteros." << endl;
+        exit(0);
+    }
+
+    int start = startVal.int_value;
+    cout<<start<<endl;
+    int end = endVal.int_value;
+    cout<<end<<endl;
+
+    // Añadir un nuevo nivel para el ámbito del bucle
+    env.add_level();
+    ImpValue loopVar;
+    loopVar.set_default_value(TINT);
+
+    for (int i = start; i <= end; ++i) {
+        // Actualizar el valor de la variable del bucle
+        loopVar.int_value = i;
+        env.add_var(s->id->id, loopVar);
+
+        // Ejecutar el cuerpo del bucle
+        s->body->accept(this);
+
+        // Si se ejecutó un return statement dentro del cuerpo, salir del bucle
+        if (retcall) break;
+    }
+
+    // Eliminar el nivel del ámbito del bucle
+    env.remove_level();
+    return;
+}
+
 void ImpInterpreter::visit(ReturnStatement* s) {
   if (s->e != NULL)
     retval = s->e->accept(this);

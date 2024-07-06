@@ -2,6 +2,8 @@ CC=g++
 
 SRC_IMP=test_imp_fun.cpp imp.cpp imp_parser.cpp imp_printer.cpp imp_interpreter.cpp imp_value.cpp imp_typechecker.cpp imp_type.cpp imp_codegen.cpp
 
+#imp.cpp imp_parser.cpp imp_printer.cpp imp_interpreter.cpp imp_value.cpp imp_typechecker.cpp imp_type.cpp
+
 SRC_SVM=svm_run.cpp svm_parser.cpp svm.cpp
 
 
