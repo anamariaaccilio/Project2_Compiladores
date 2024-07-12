@@ -191,6 +191,9 @@ void ImpCodeGen::visit(WhileStatement* s) {
   return;
 }
 
+void ImpCodeGen::visit(ForDoStatement* s) {
+}
+
 void ImpCodeGen::visit(ReturnStatement* s) {
   // agregar codigo
   
