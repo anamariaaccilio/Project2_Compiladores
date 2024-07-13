@@ -55,5 +55,13 @@ De esta manera, todas las declaraciones de variables para cada función empiezan
 
 #### Dirección de parámetros de una función
 
+Como vimos en clase de teoría, los parámetros se enumeran desde i=1 hasta n, siendo n el número de parámetros. La convención a la que se llegó es que la dirección en la que se debe guardar el parámetro i es i-(#parámetros+3). Este cálculo se realizó en ImpCodeGen::visit(FunDec* fd):
 
+![image](https://github.com/user-attachments/assets/cc1e7f11-5f7f-4cd9-a429-c7f4e9b493a1)
+
+#### Dirección del valor de retorno
+
+Otra convención que se hizo en el curso es que el valor de retorno de una función se almacena siempre en -1*(#parámetros+3). Este cálculo se hizo también en ImpCodeGen::visit(FunDec* fd):
+
+![image](https://github.com/user-attachments/assets/c9216a46-a708-4487-9911-072c2c2adb62)
 
