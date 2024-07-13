@@ -65,3 +65,14 @@ Otra convención que se hizo en el curso es que el valor de retorno de una funci
 
 ![image](https://github.com/user-attachments/assets/c9216a46-a708-4487-9911-072c2c2adb62)
 
+#### Tests
+
+Para verificar la correctitud, comparamos nuestros .sm generados con los .sm que nos fueron brindados como ejemplo. Comparamos:
+
+- ejemplo_main.imp.sm con ejemplo_main.imp_sol.sm
+- ejemplo_suma.imp.sm con ejemplo_suma.imp_sol.sm
+
+, los cuales coincidieron al 100%.
+
+En el caso de funciones recursivas como ejemplo_sumarec.imp, no logramos calcular correctamente el valor de enter, pero el resto de líneas coinciden con las soluciones que nos brindaron.
+
