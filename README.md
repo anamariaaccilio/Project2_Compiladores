@@ -65,7 +65,7 @@ Otra convención que se hizo en el curso es que el valor de retorno de una funci
 
 ![image](https://github.com/user-attachments/assets/c9216a46-a708-4487-9911-072c2c2adb62)
 
-#### Tests
+### Tests
 
 Para verificar la correctitud, comparamos nuestros .sm generados con los .sm que nos fueron brindados como ejemplo. Comparamos:
 
