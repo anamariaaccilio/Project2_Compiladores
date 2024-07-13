@@ -33,3 +33,27 @@ Cuarto, para contar el número de variables locales por función modificamos Imp
 Por último, al final del programa, el máximo tamaño de la pila para una función se calcula como #variables_locales + #variables_globales y se guarda en fentry.max_stack. Por su parte, el espacio requerido para las variables locales se guarda en fentry.mem_locals:
 
 ![image](https://github.com/user-attachments/assets/afc09d7b-8fee-4d16-be3e-c360f164f1b1)
+
+### Direcciones de variables
+
+#### Diferenciando variables locales de globales
+
+Partimos del método ImpCodeGen::visit(Program* p), en donde se inicializa current_dir=1 y se clasifican las variables como globales o locales utilizando la variable process_global.
+
+Toda declaración de variables (tanto locales como globales) y su respectiva de asignación de dirección de memoria se realiza en el método ImpCodeGen::visit(VarDec* vd) de la siguiente manera:
+
+![image](https://github.com/user-attachments/assets/d6eec15b-3d9e-4e65-bdf7-0beaea61bb69)
+
+Para reiniciar el valor de current_dir cada vez que acabamos de recorrer una función, se le asigna a current_dir=1 en ImpCodeGen::visit(FunDec* fd):
+
+![image](https://github.com/user-attachments/assets/da26be50-2049-454c-b342-00958e5b7a6d)
+
+De esta manera, todas las declaraciones de variables para cada función empiezan en la dirección de memoria 1. La forma en la que se distinguirá el acceso a memoria a direcciones de variables locales o globales será mediante el uso de store o storer según sea el caso:
+
+![image](https://github.com/user-attachments/assets/b2fb1a36-23bc-4043-9901-a4ae5fa66922)
+
+
+#### Dirección de parámetros de una función
+
+
+
