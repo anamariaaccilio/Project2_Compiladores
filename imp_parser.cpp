@@ -312,7 +312,6 @@ Stm* Parser::parseStatement() {
       s = new AssignStatement(lex, parseCExp());
     } else if (for_stat == 1) {
       cout << "Iniciando For Do" << endl;
-    //memoria_update(lex, v);
     } else if (match(Token::LPAREN)) { 
       list<Exp*> args;
       if (!check(Token::RPAREN)){

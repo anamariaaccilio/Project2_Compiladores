@@ -6,4 +6,5 @@ fun void main()
   b = 4;
   y = a + b;
   print(y);
+  return ()
 endfun
