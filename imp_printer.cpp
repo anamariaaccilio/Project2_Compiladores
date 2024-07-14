@@ -107,6 +107,19 @@ void ImpPrinter::visit(WhileStatement* s) {
   return;
 }
 
+void ImpPrinter::visit(ForDoStatement* s) {
+  cout << "for ";
+  s->id->accept(this);
+  cout << " in (";
+  s->e1->accept(this);
+  cout << ",";
+  s->e2->accept(this);
+  cout << ") do" << endl;
+  s->body->accept(this);
+  cout << "endfor";
+  return;
+}
+
 void ImpPrinter::visit(ReturnStatement* s) {
   cout << "return (";
   if (s->e != NULL) s->e->accept(this);

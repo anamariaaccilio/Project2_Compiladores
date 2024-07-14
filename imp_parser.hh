@@ -17,8 +17,8 @@ using namespace std;
 
 class Token {
 public:
-  enum Type { LPAREN=0, RPAREN, PLUS, MINUS, MULT, DIV, EXP, LT, LTEQ, EQ,  NUM, ID, PRINT, SEMICOLON, COMMA, ASSIGN, CONDEXP, IF, THEN, ELSE, ENDIF, WHILE, DO, ENDWHILE, ERR, END, VAR, RETURN, FUN, ENDFUN, TRUE, FALSE };
-  static const char* token_names[32]; 
+  enum Type { LPAREN=0, RPAREN, PLUS, MINUS, MULT, DIV, EXP, LT, LTEQ, EQ,  NUM, ID, PRINT, SEMICOLON, COMMA, ASSIGN, CONDEXP, IF, THEN, ELSE, ENDIF, WHILE, FOR, IN, DO, ENDWHILE, ENDFOR, ERR, END, VAR, RETURN, FUN, ENDFUN, TRUE, FALSE };
+  static const char* token_names[35]; 
   Type type;
   string lexema;
   Token(Type);
@@ -48,6 +48,7 @@ class Parser {
 private:
   Scanner* scanner;
   Token *current, *previous;
+  int for_stat;
   bool match(Token::Type ttype);
   bool check(Token::Type ttype);
   bool advance();

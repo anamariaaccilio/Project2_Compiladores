@@ -218,6 +218,57 @@ void ImpCodeGen::visit(WhileStatement* s) {
   return;
 }
 
+void ImpCodeGen::visit(ForDoStatement* s) {
+    string l1 = next_label();
+    string l2 = next_label();
+    string l3 = next_label();
+
+    // Añadir nuevo nivel de direcciones para el bucle for
+    direcciones.add_level();
+
+    // Inicializar el contador
+    s->e1->accept(this); // Generar código para la expresión inicial
+    VarEntry ventry;
+    ventry.dir = current_dir;
+    ventry.is_global = false; // Es local al for
+    ventry.is_param = false;
+    direcciones.add_var(s->id->id, ventry); // Añadir la variable del for a la tabla de direcciones
+    current_dir++; // Incrementar la dirección actual
+
+    if (ventry.is_global) {
+        codegen(nolabel, "store", ventry.dir);
+    } else {
+        codegen(nolabel, "storer", ventry.dir);
+    }
+
+    codegen(l1, "skip"); // Etiqueta para el inicio del bucle
+
+    // Evaluar la condición
+    s->id->accept(this); // Cargar el valor del contador
+    s->e2->accept(this); // Cargar el valor del límite
+    codegen(nolabel, "le"); // Comparar contador <= límite
+    codegen(nolabel, "jmpz", l2); // Saltar al final si la condición es falsa
+
+    // Ejecutar el cuerpo del bucle
+    s->body->accept(this);
+
+    // Incrementar el contador
+    s->id->accept(this); // Cargar el valor del contador
+    codegen(nolabel, "push", 1); // Cargar el valor 1
+    codegen(nolabel, "add"); // Incrementar el contador
+    if (ventry.is_global) {
+        codegen(nolabel, "store", ventry.dir);
+    } else {
+        codegen(nolabel, "storer", ventry.dir);
+    }
+
+    codegen(nolabel, "goto", l1); // Volver al inicio del bucle
+    codegen(l2, "skip"); // Etiqueta para el final del bucle
+
+    // Eliminar el nivel de direcciones del bucle for
+    direcciones.remove_level();
+}
+
 void ImpCodeGen::visit(ReturnStatement* s) {
   // agregar codigo
   VarEntry ventry = direcciones.lookup("return");

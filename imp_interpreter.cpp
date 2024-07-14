@@ -138,6 +138,47 @@ void ImpInterpreter::visit(ReturnStatement* s) {
   return;
 }
 
+void ImpInterpreter::visit(ForDoStatement* s) {
+    // Evaluar las expresiones de inicio y fin del rango
+    ImpValue startVal = s->e1->accept(this);
+    ImpValue endVal = s->e2->accept(this);
+
+    // Verificar que las expresiones sean de tipo int
+    if (startVal.type != TINT || endVal.type != TINT) {
+        cout << "Error de tipos: las expresiones de rango en For deben ser enteros." << endl;
+        exit(0);
+    }
+
+    if(startVal.int_value > endVal.int_value ){
+        cout << "Error: la expresion de inicio del rango debe ser menor o igual a la expresion de fin del rango." << endl;
+        exit(0);
+    }
+
+    int start = startVal.int_value;
+    int end = endVal.int_value;
+
+    // Añadir un nuevo nivel para el ámbito del bucle
+    env.add_level();
+    ImpValue loopVar;
+    loopVar.set_default_value(TINT);
+
+    for (int i = start; i <= end; ++i) {
+        // Actualizar el valor de la variable del bucle
+        loopVar.int_value = i;
+        env.add_var(s->id->id, loopVar);
+
+        // Ejecutar el cuerpo del bucle
+        s->body->accept(this);
+
+        // Si se ejecutó un return statement dentro del cuerpo, salir del bucle
+        if (retcall) break;
+    }
+
+    // Eliminar el nivel del ámbito del bucle
+    env.remove_level();
+    return;
+}
+
 void ImpInterpreter::visit(FCallStm* s) {
   FunDec* fdec = fdecs.lookup(s->fname);
   env.add_level();

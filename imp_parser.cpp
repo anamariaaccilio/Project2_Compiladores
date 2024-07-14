@@ -3,10 +3,10 @@
 #include "imp_parser.hh"
 
 
-const char* Token::token_names[32] = {
+const char* Token::token_names[35] = {
   "LPAREN" , "RPAREN", "PLUS", "MINUS", "MULT","DIV","EXP","LT","LTEQ","EQ",
-  "NUM", "ID", "PRINT", "SEMICOLON", "COMMA", "ASSIGN", "CONDEXP", "IF", "THEN", "ELSE", "ENDIF", "WHILE", "DO",
-  "ENDWHILE", "ERR", "END", "VAR", "RETURN", "FUN", "ENDFUN", "TRUE", "FALSE" };
+  "NUM", "ID", "PRINT", "SEMICOLON", "COMMA", "ASSIGN", "CONDEXP", "IF", "THEN", "ELSE", "ENDIF", "WHILE","FOR","IN", "DO",
+  "ENDWHILE","ENDFOR", "ERR", "END", "VAR", "RETURN", "FUN", "ENDFUN", "TRUE", "FALSE" };
 
 Token::Token(Type type):type(type) { lexema = ""; }
 
@@ -34,9 +34,12 @@ Scanner::Scanner(string s):input(s),first(0),current(0) {
   reserved["then"] = Token::THEN;
   reserved["else"] = Token::ELSE;
   reserved["endif"] = Token::ENDIF;
+  reserved["for"] = Token::FOR;
+  reserved["in"] = Token::IN;
   reserved["while"] = Token::WHILE;
   reserved["do"] = Token::DO;
   reserved["endwhile"] = Token::ENDWHILE;
+  reserved["endfor"] = Token::ENDFOR;
   reserved["var"] = Token::VAR;
   reserved["return"] = Token::RETURN;
   reserved["fun"] = Token::FUN;
@@ -133,6 +136,7 @@ Token::Type Scanner::checkReserved(string lexema) {
 
 
 // match and consume next token
+
 bool Parser::match(Token::Type ttype) {
   if (check(ttype)) {
     advance();
@@ -145,6 +149,7 @@ bool Parser::check(Token::Type ttype) {
   if (isAtEnd()) return false;
   return current->type == ttype;
 }
+
 
 
 bool Parser::advance() {
@@ -281,8 +286,6 @@ FunDecList* Parser::parseFunDecList() {
   return fdl;
 }
 
-
-
 StatementList* Parser::parseStatementList() {
   StatementList* p = new StatementList();
   p->add(parseStatement());
@@ -300,12 +303,16 @@ StatementList* Parser::parseStatementList() {
 Stm* Parser::parseStatement() {
   Stm* s = NULL;
   Exp* e = NULL;
+  Exp* e2 = NULL;
+  IdExp* id = NULL;
   Body *tb, *fb;
   if (match(Token::ID)) {
     string lex = previous->lexema;
     if (match(Token::ASSIGN)) {
       s = new AssignStatement(lex, parseCExp());
-      // memoria_update(lex, v);
+    } else if (for_stat == 1) {
+      cout << "Iniciando For Do" << endl;
+    //memoria_update(lex, v);
     } else if (match(Token::LPAREN)) { 
       list<Exp*> args;
       if (!check(Token::RPAREN)){
@@ -322,8 +329,7 @@ Stm* Parser::parseStatement() {
     } else {
       cout << "Error: Esperaba '=' o '(' después de un identificador" << endl;
       exit(0);
-    }    
-
+    }
   } else if (match(Token::PRINT)) {
     if (!match(Token::LPAREN)) {
       cout << "Error: esperaba '(' " << endl;
@@ -355,6 +361,28 @@ Stm* Parser::parseStatement() {
     if (!match(Token::ENDWHILE))
 	parserError("Esperaba 'endwhile'");
     s = new WhileStatement(e,tb);
+  } else if (match(Token::FOR)) {
+    for_stat = 1;
+    if (!match(Token::ID))
+      parserError("Esperaba 'id'");
+    id = new IdExp(previous->lexema);
+    if (!match(Token::IN))
+      parserError("Esperaba 'in'");
+    if (!match(Token::LPAREN))
+      parserError("Error: esperaba '('");
+    e = parseExpression();
+    if (!match(Token::COMMA))
+      parserError("Esperaba una coma");
+    e2 = parseExpression();
+    if (!match(Token::RPAREN))
+      parserError("Error: esperaba ')'");
+    if (!match(Token::DO))
+      parserError("Esperaba 'do'");
+    tb = parseBody();
+    if (!match(Token::ENDFOR))
+      parserError("Esperaba 'endfor'");
+    s = new ForDoStatement(id, e, e2, tb);
+    for_stat = 0;  // Restablecer la bandera
   } else if (match(Token::RETURN)) {
     if (!match(Token::LPAREN)) parserError("Esperaba 'lparen'");
     if (!check(Token::RPAREN)) 

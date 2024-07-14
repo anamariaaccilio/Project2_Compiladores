@@ -55,6 +55,7 @@ public:
   void visit(PrintStatement*);
   void visit(IfStatement*);
   void visit(WhileStatement*);
+  void visit(ForDoStatement*);
   void visit(ReturnStatement* e);
   void visit(FCallStm* e);
   

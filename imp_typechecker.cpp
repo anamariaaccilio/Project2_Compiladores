@@ -225,6 +225,31 @@ void ImpTypeChecker::visit(WhileStatement* s) {
  return;
 }
 
+void ImpTypeChecker::visit(ForDoStatement* s) {
+    // Verificar que las expresiones del rango sean de tipo int
+    ImpType primer_e = s->e1->accept(this); 
+    if (!primer_e.match(inttype)) {
+        cout << "La primera expresion debe ser tipo int" << endl;
+        exit(0);
+    }
+
+    ImpType segundo_e = s->e2->accept(this);
+    if (!segundo_e.match(inttype)) {
+        cout << "La segunda expresion debe ser tipo int" << endl;
+        exit(0);
+    }
+
+    // Añadir variable del bucle al entorno
+    env.add_level();  // Añadir un nuevo nivel para el ámbito del bucle
+    env.add_var(s->id->id, inttype);
+
+    // Verificar el cuerpo del bucle
+    s->body->accept(this);
+
+    env.remove_level();  // Eliminar el nivel del ámbito del bucle
+    return;
+}
+
 void ImpTypeChecker::visit(ReturnStatement* s) {
  ImpType rtype = env.lookup("return");
   ImpType etype;
