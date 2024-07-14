@@ -34,10 +34,15 @@ private:
   vector<string> fnames;
   int sp, max_sp;
   int dir, max_dir;
+  int nivel;
   void sp_decr(int n);
   void sp_incr(int n);
 
 public:
+  int var_globales;
+  void dir_incr(int n);
+  void dir_decr(int n);
+
   void typecheck(Program*);
   void visit(Program*);
   void visit(Body*);

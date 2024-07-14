@@ -110,11 +110,11 @@ void ImpPrinter::visit(WhileStatement* s) {
 void ImpPrinter::visit(ForDoStatement* s) {
   cout << "for ";
   s->id->accept(this);
-  cout << "in (";
+  cout << " in (";
   s->e1->accept(this);
-  cout << " , ";
+  cout << ",";
   s->e2->accept(this);
-  cout << " ) do" << endl;
+  cout << ") do" << endl;
   s->body->accept(this);
   cout << "endfor";
   return;

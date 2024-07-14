@@ -131,6 +131,13 @@ void ImpInterpreter::visit(WhileStatement* s) {
  return;
 }
 
+void ImpInterpreter::visit(ReturnStatement* s) {
+  if (s->e != NULL)
+    retval = s->e->accept(this);
+  retcall = true;
+  return;
+}
+
 void ImpInterpreter::visit(ForDoStatement* s) {
     // Evaluar las expresiones de inicio y fin del rango
     ImpValue startVal = s->e1->accept(this);
@@ -142,10 +149,13 @@ void ImpInterpreter::visit(ForDoStatement* s) {
         exit(0);
     }
 
+    if(startVal.int_value > endVal.int_value ){
+        cout << "Error: la expresion de inicio del rango debe ser menor o igual a la expresion de fin del rango." << endl;
+        exit(0);
+    }
+
     int start = startVal.int_value;
-    cout<<start<<endl;
     int end = endVal.int_value;
-    cout<<end<<endl;
 
     // Añadir un nuevo nivel para el ámbito del bucle
     env.add_level();
@@ -167,13 +177,6 @@ void ImpInterpreter::visit(ForDoStatement* s) {
     // Eliminar el nivel del ámbito del bucle
     env.remove_level();
     return;
-}
-
-void ImpInterpreter::visit(ReturnStatement* s) {
-  if (s->e != NULL)
-    retval = s->e->accept(this);
-  retcall = true;
-  return;
 }
 
 // Expressions

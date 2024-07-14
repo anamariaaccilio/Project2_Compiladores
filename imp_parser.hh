@@ -48,6 +48,7 @@ class Parser {
 private:
   Scanner* scanner;
   Token *current, *previous;
+  int for_stat;
   bool match(Token::Type ttype);
   bool check(Token::Type ttype);
   bool advance();

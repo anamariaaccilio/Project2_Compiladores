@@ -17,6 +17,7 @@ class VarEntry {
 public:
   int dir;
   bool is_global;
+  bool is_param;
 };
 
 class ImpCodeGen : public ImpVisitor {
@@ -37,7 +38,6 @@ public:
   void visit(ForDoStatement*);
   void visit(ReturnStatement*);
 
-  
   int visit(BinaryExp* e);
   int visit(NumberExp* e);
   int visit(TrueFalseExp* e);
@@ -58,6 +58,7 @@ private:
   int max_stack, mem_locals, mem_globals;
   bool process_global;
   int num_params;
+  string current_function; // Agregado
   void codegen(string label, string instr);
   void codegen(string label, string instr, int arg);
   void codegen(string label, string instr, string jmplabel);
@@ -65,6 +66,4 @@ private:
   string get_flabel(string fname);
 };
 
-
 #endif
-

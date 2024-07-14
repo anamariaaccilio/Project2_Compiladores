@@ -11,26 +11,42 @@ ImpTypeChecker::ImpTypeChecker():inttype(),booltype(),voidtype(),maintype() {
 
 // Metodos usados para el analsis de altura maxima de pila
 void ImpTypeChecker::sp_incr(int n) {
-  sp++;
+  sp += n;
   if (sp > max_sp) max_sp = sp;
 }
 
 void ImpTypeChecker::sp_decr(int n) {
-  sp--;
+  sp -= n;
   if (sp < 0) {
     cout << "stack less than 0" << endl;
     exit(0);
   }
 }
 
+void ImpTypeChecker::dir_incr(int n) {
+  dir += n;
+  if (dir > max_dir) max_dir = dir;
+}
+
+void ImpTypeChecker::dir_decr(int n) {
+  dir -= n;
+  if (dir < 0) {
+    cout << "memory address less than 0" << endl;
+    exit(0);
+  }
+}
+
 void ImpTypeChecker::typecheck(Program* p) {
   env.clear();
+  var_globales = 0;
+  nivel = 0;
   p->accept(this);
   return;
 }
 
 void ImpTypeChecker::visit(Program* p) {
   env.add_level();
+  nivel += 1;
   ftable.add_level();  // nuevo
   p->var_decs->accept(this);
   p->fun_decs->accept(this);
@@ -45,6 +61,7 @@ void ImpTypeChecker::visit(Program* p) {
   }
 
   env.remove_level();
+  nivel -= 1;
 
   // Codigo usado para ver contenido de ftable
   cout << "Reporte ftable" << endl;
@@ -52,8 +69,12 @@ void ImpTypeChecker::visit(Program* p) {
     cout << "-- Function: " << fnames[i] << endl;
     FEntry fentry = ftable.lookup(fnames[i]);
     cout << fentry.fname << " : " << fentry.ftype << endl;
+    fentry.max_stack = fentry.mem_locals + var_globales;
     cout << "max stack height: " << fentry.max_stack << endl;
     cout << "mem local variables: " << fentry.mem_locals << endl;
+
+    // actulizar fentry en ftable
+    ftable.add_var(fentry.fname, fentry);
   }
 
   // no remover nivel de ftable porque sera usado por codegen.
@@ -62,12 +83,17 @@ void ImpTypeChecker::visit(Program* p) {
 
 void ImpTypeChecker::visit(Body* b) {
   // guardar direccion actual (dir)
+  int saved_dir = dir;
   
   env.add_level();
+  nivel += 1;
   b->var_decs->accept(this);
   b->slist->accept(this);
   env.remove_level();
+  nivel -= 1;
+  
   // restaurar direccion de entrada
+  dir = saved_dir;
   
   return;
 }
@@ -80,7 +106,6 @@ void ImpTypeChecker::visit(VarDecList* decs) {
   return;
 }
 
-// Codigo completo
 void ImpTypeChecker::visit(FunDecList* s) {
   list<FunDec*>::iterator it;
   for (it = s->fdlist.begin(); it != s->fdlist.end(); ++it) {
@@ -113,8 +138,6 @@ void ImpTypeChecker::add_fundec(FunDec* fd) {
   return;
 }
 
-// Los tipos de declaraciones de variables son
-// agregados al environment
 void ImpTypeChecker::visit(VarDec* vd) {
   ImpType type;  
   type.set_basic_type(vd->type);
@@ -126,12 +149,15 @@ void ImpTypeChecker::visit(VarDec* vd) {
   for (it = vd->vars.begin(); it != vd->vars.end(); ++it) {
     env.add_var(*it, type);
     // actualizar dir y max_dir
+    dir_incr(1);
+    if(nivel==1) var_globales++;
   }   
   return;
 }
 
 void ImpTypeChecker::visit(FunDec* fd) {
   env.add_level();
+  nivel += 1;
   ImpType funtype = env.lookup(fd->fname);
   ImpType rtype, ptype;
   rtype.set_basic_type(funtype.types.back());
@@ -144,17 +170,15 @@ void ImpTypeChecker::visit(FunDec* fd) {
   env.add_var("return", rtype);
   fd->body->accept(this);
   env.remove_level();
+  nivel -= 1;
   return;
 }
 
-
-
- 
 void ImpTypeChecker::visit(StatementList* s) {
   list<Stm*>::iterator it;
   for (it = s->slist.begin(); it != s->slist.end(); ++it) {
     (*it)->accept(this);
-   }
+  }
   return;
 }
 
@@ -193,7 +217,7 @@ void ImpTypeChecker::visit(IfStatement* s) {
 
 void ImpTypeChecker::visit(WhileStatement* s) {
   if (!s->cond->accept(this).match(booltype)) {
-    cout << "Expresion conditional en IF debe de ser bool" << endl;
+    cout << "Expresion conditional en WHILE debe de ser bool" << endl;
     exit(0);
   }
   // que hacer con sp?
@@ -241,7 +265,6 @@ void ImpTypeChecker::visit(ReturnStatement* s) {
   return;
 }
 
-
 ImpType ImpTypeChecker::visit(BinaryExp* e) {
   ImpType t1 = e->left->accept(this);
   ImpType t2 = e->right->accept(this);
@@ -265,23 +288,28 @@ ImpType ImpTypeChecker::visit(BinaryExp* e) {
     break;
   }
   // que hacer con sp?
+  sp_decr(1);
   return result;
 }
 
 ImpType ImpTypeChecker::visit(NumberExp* e) {
   // que hacer con sp?
+  sp_incr(1);
   return inttype;
 }
 
 ImpType ImpTypeChecker::visit(TrueFalseExp* e) {
   // que hacer con sp?
+  sp_incr(1);
   return booltype;
 }
 
 ImpType ImpTypeChecker::visit(IdExp* e) {
   // que hacer con sp?
-  if (env.check(e->id))
+  if (env.check(e->id)){
+    sp_incr(1);
     return env.lookup(e->id);
+  }
   else {
     cout << "Variable indefinida: " << e->id << endl;
     exit(0);
@@ -293,19 +321,44 @@ ImpType ImpTypeChecker::visit(ParenthExp* ep) {
 }
 
 ImpType ImpTypeChecker::visit(CondExp* e) {
+  // Verificar que la condición sea de tipo bool
   if (!e->cond->accept(this).match(booltype)) {
     cout << "Tipo en ifexp debe de ser bool" << endl;
     exit(0);
   }
-  // que hacer con sp?
-  ImpType ttype =  e->etrue->accept(this);
-  // que hacer con sp?
+  // Decrementar la pila después de evaluar la condición
+  sp_decr(1);
+  
+  // Guardar la altura actual de la pila antes de evaluar las ramas
+  int saved_sp = sp;
+
+  // Evaluar la rama verdadera
+  ImpType ttype = e->etrue->accept(this);
+
+  // Guardar la altura de la pila después de evaluar la rama verdadera
+  int true_sp = sp;
+
+  // Restaurar la altura de la pila a su valor original antes de evaluar la rama falsa
+  sp = saved_sp;
+
+  // Evaluar la rama falsa y verificar que los tipos coincidan
   if (!ttype.match(e->efalse->accept(this))) {
     cout << "Tipos en ifexp deben de ser iguales" << endl;
     exit(0);
   }
+
+  // Guardar la altura de la pila después de evaluar la rama falsa
+  int false_sp = sp;
+
+  // La altura de la pila después del condicional es la mayor de las dos ramas
+  sp = std::max(true_sp, false_sp);
+
+  // Incrementar la pila ya que el resultado del condicional está en la pila
+  sp_incr(1);
+
   return ttype;
 }
+
 
 ImpType ImpTypeChecker::visit(FCallExp* e) {
   if (!env.check(e->fname)) {
@@ -325,6 +378,7 @@ ImpType ImpTypeChecker::visit(FCallExp* e) {
   rtype.set_basic_type(funtype.types[num_fun_args]);
 
   // que hacer con sp y el valor de retorno?
+  sp_incr(1);
   
   if (num_fun_args != num_fcall_args) {
     cout << "(Function call) Numero de argumentos no corresponde a declaracion de: " << e->fname << endl;

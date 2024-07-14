@@ -39,6 +39,7 @@ Scanner::Scanner(string s):input(s),first(0),current(0) {
   reserved["while"] = Token::WHILE;
   reserved["do"] = Token::DO;
   reserved["endwhile"] = Token::ENDWHILE;
+  reserved["endfor"] = Token::ENDFOR;
   reserved["var"] = Token::VAR;
   reserved["return"] = Token::RETURN;
   reserved["fun"] = Token::FUN;
@@ -135,6 +136,7 @@ Token::Type Scanner::checkReserved(string lexema) {
 
 
 // match and consume next token
+
 bool Parser::match(Token::Type ttype) {
   if (check(ttype)) {
     advance();
@@ -147,6 +149,7 @@ bool Parser::check(Token::Type ttype) {
   if (isAtEnd()) return false;
   return current->type == ttype;
 }
+
 
 
 bool Parser::advance() {
@@ -246,9 +249,10 @@ FunDec* Parser::parseFunDec() {
       if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
       vars.push_back(previous->lexema);
       while(match(Token::COMMA)) {
-	types.push_back(previous->lexema);
-	if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
-	vars.push_back(previous->lexema);
+        if (!match(Token::ID)) parserError("Expecting type in fun declaration");
+        types.push_back(previous->lexema);
+        if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
+        vars.push_back(previous->lexema);
       }     
     }
     if (!match(Token::RPAREN)) parserError("Esperaba RPAREN en declaracion de funcion");
@@ -281,8 +285,6 @@ FunDecList* Parser::parseFunDecList() {
   return fdl;
 }
 
-
-
 StatementList* Parser::parseStatementList() {
   StatementList* p = new StatementList();
   p->add(parseStatement());
@@ -304,11 +306,14 @@ Stm* Parser::parseStatement() {
   Body *tb, *fb;
   if (match(Token::ID)) {
     string lex = previous->lexema;
-    if (!match(Token::ASSIGN)) {
+    if (match(Token::ASSIGN)) {
+      s = new AssignStatement(lex, parseCExp());
+    } else if (for_stat == 1) {
+      cout << "Iniciando For Do" << endl;
+    } else {
       cout << "Error: esperaba =" << endl;
       exit(0);
     }
-    s = new AssignStatement(lex, parseCExp());
     //memoria_update(lex, v);
   } else if (match(Token::PRINT)) {
     if (!match(Token::LPAREN)) {
@@ -342,31 +347,27 @@ Stm* Parser::parseStatement() {
 	parserError("Esperaba 'endwhile'");
     s = new WhileStatement(e,tb);
   } else if (match(Token::FOR)) {
+    for_stat = 1;
     if (!match(Token::ID))
       parserError("Esperaba 'id'");
     id = new IdExp(previous->lexema);
     if (!match(Token::IN))
       parserError("Esperaba 'in'");
-    if(!match(Token::LPAREN)){
+    if (!match(Token::LPAREN))
       parserError("Error: esperaba '('");
-    }
-      e = parseExpression();
-    if(!match(Token::COMMA)){
+    e = parseExpression();
+    if (!match(Token::COMMA))
       parserError("Esperaba una coma");
-    }
-      e2 = parseExpression();
-    if(e>e2){
-      parserError("Error: el segundo valor del for debe ser menor que el primero");
-    }
-    if(!match(Token::RPAREN)){
+    e2 = parseExpression();
+    if (!match(Token::RPAREN))
       parserError("Error: esperaba ')'");
-    }
     if (!match(Token::DO))
       parserError("Esperaba 'do'");
-      tb = parseBody();
+    tb = parseBody();
     if (!match(Token::ENDFOR))
-	    parserError("Esperaba 'endfor'");
-    s = new ForDoStatement(id,e,e2,tb);
+      parserError("Esperaba 'endfor'");
+    s = new ForDoStatement(id, e, e2, tb);
+    for_stat = 0;  // Restablecer la bandera
   } else if (match(Token::RETURN)) {
     if (!match(Token::LPAREN)) parserError("Esperaba 'lparen'");
     if (!check(Token::RPAREN)) 
