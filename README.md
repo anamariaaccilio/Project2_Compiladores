@@ -34,7 +34,7 @@ g++ imp_codegen.cpp imp.cpp imp_interpreter.cpp imp_parser.cpp imp_printer.cpp i
 ./imp ejemplo.imp
 ```
 
-## Item 1
+## Item 1: El TypeChecker y Codegen
 
 ### Typechecker por función
 
