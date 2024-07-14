@@ -318,3 +318,26 @@ int ImpCodeGen::visit(FCallExp* e) {
   codegen(nolabel,"call");
   return 0;
 }
+
+void ImpCodeGen::visit(FCallStm* s) {
+  FEntry fentry = analysis->ftable.lookup(s->fname);
+  ImpType ftype = fentry.ftype;
+
+  //alocar espacio para llamar a la funcion (alloc 1)
+  codegen(nolabel,"alloc",1);
+
+  //pushear argumentos
+  list<Exp*>::iterator it;
+  for (it = s->args.begin(); it != s->args.end(); ++it) {
+    (*it)->accept(this);
+  }
+
+  //mark
+  codegen(nolabel,"mark");
+
+  // agregar codigo
+  codegen(nolabel,"pusha",get_flabel(s->fname));
+
+  codegen(nolabel,"call");
+  return;
+}

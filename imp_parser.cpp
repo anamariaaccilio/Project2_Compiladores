@@ -244,6 +244,7 @@ FunDec* Parser::parseFunDec() {
       if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
       vars.push_back(previous->lexema);
       while(match(Token::COMMA)) {
+        if(!match(Token::ID)) parserError("Expecting type in fun declaration");
 	types.push_back(previous->lexema);
 	if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
 	vars.push_back(previous->lexema);
@@ -300,20 +301,35 @@ Stm* Parser::parseStatement() {
   Body *tb, *fb;
   if (match(Token::ID)) {
     string lex = previous->lexema;
-    if (!match(Token::ASSIGN)) {
-      cout << "Error: esperaba =" << endl;
+    if (match(Token::ASSIGN)) {
+      s = new AssignStatement(lex, parseCExp());
+      // memoria_update(lex, v);
+    } else if (match(Token::LPAREN)) { 
+      list<Exp*> args;
+      if (!check(Token::RPAREN)){
+        args.push_back(parseCExp());
+        while (match(Token::COMMA)){
+          args.push_back(parseCExp());
+        }
+      }
+      if (!match(Token::RPAREN)) {
+        cout << "Error: esperaba ')'" << endl;
+        exit(0);
+      }
+      s = new FCallStm(lex, args);
+    } else {
+      cout << "Error: Esperaba '=' o '(' después de un identificador" << endl;
       exit(0);
-    }
-    s = new AssignStatement(lex, parseCExp());
-    //memoria_update(lex, v);
+    }    
+
   } else if (match(Token::PRINT)) {
     if (!match(Token::LPAREN)) {
-      cout << "Error: esperaba ( " << endl;
+      cout << "Error: esperaba '(' " << endl;
       exit(0);
     }
     e = parseCExp();
     if (!match(Token::RPAREN)) {
-      cout << "Error: esperaba )" << endl;
+      cout << "Error: esperaba ')'" << endl;
       exit(0);
     }
     s = new PrintStatement(e);

@@ -1,5 +1,3 @@
-var int a, b;
-
 fun int suma(int x)
   var int accum;
   accum = 0;
@@ -13,13 +11,17 @@ fun int suma(int x)
   return (accum)
 endfun
 
+fun void imprime(int x, int y)
+    var int z;
+    z = x + y;
+    print(z);
+    return()
+endfun
 
 fun void main()
-  var int y;
-  a = 10;
-  b = 11;
-  print(14);
-  y = suma(4);
-  print(y);
-  return ()
+    var int x; 
+    x = 10; 
+    suma(x);
+    imprime(x, x + 10);
+    return()
 endfun
