@@ -249,10 +249,11 @@ FunDec* Parser::parseFunDec() {
       if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
       vars.push_back(previous->lexema);
       while(match(Token::COMMA)) {
-        if (!match(Token::ID)) parserError("Expecting type in fun declaration");
-        types.push_back(previous->lexema);
-        if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
-        vars.push_back(previous->lexema);
+        // agregado la condicional del id
+        if(!match(Token::ID)) parserError("Expecting type in fun declaration");
+	types.push_back(previous->lexema);
+	if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
+	vars.push_back(previous->lexema);
       }     
     }
     if (!match(Token::RPAREN)) parserError("Esperaba RPAREN en declaracion de funcion");
@@ -298,6 +299,7 @@ StatementList* Parser::parseStatementList() {
   id = exp
   print(x)
  */
+
 Stm* Parser::parseStatement() {
   Stm* s = NULL;
   Exp* e = NULL;
@@ -310,19 +312,32 @@ Stm* Parser::parseStatement() {
       s = new AssignStatement(lex, parseCExp());
     } else if (for_stat == 1) {
       cout << "Iniciando For Do" << endl;
+    //memoria_update(lex, v);
+    } else if (match(Token::LPAREN)) { 
+      list<Exp*> args;
+      if (!check(Token::RPAREN)){
+        args.push_back(parseCExp());
+        while (match(Token::COMMA)){
+          args.push_back(parseCExp());
+        }
+      }
+      if (!match(Token::RPAREN)) {
+        cout << "Error: esperaba ')'" << endl;
+        exit(0);
+      }
+      s = new FCallStm(lex, args);
     } else {
-      cout << "Error: esperaba =" << endl;
+      cout << "Error: Esperaba '=' o '(' después de un identificador" << endl;
       exit(0);
     }
-    //memoria_update(lex, v);
   } else if (match(Token::PRINT)) {
     if (!match(Token::LPAREN)) {
-      cout << "Error: esperaba ( " << endl;
+      cout << "Error: esperaba '(' " << endl;
       exit(0);
     }
     e = parseCExp();
     if (!match(Token::RPAREN)) {
-      cout << "Error: esperaba )" << endl;
+      cout << "Error: esperaba ')'" << endl;
       exit(0);
     }
     s = new PrintStatement(e);

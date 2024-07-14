@@ -19,6 +19,7 @@ public:
   virtual void visit(WhileStatement* e) = 0;
   virtual void visit(ForDoStatement* e) = 0;
   virtual void visit(ReturnStatement* e) = 0;
+  virtual void visit(FCallStm* e) = 0;
   
   virtual ImpValue visit(BinaryExp* e) = 0;
   virtual ImpValue visit(NumberExp* e) = 0;
@@ -27,6 +28,7 @@ public:
   virtual ImpValue visit(ParenthExp* e) = 0;
   virtual ImpValue visit(CondExp* e) = 0;
   virtual ImpValue visit(FCallExp* e) = 0;
+  
 };
 
 

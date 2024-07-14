@@ -1,0 +1,25 @@
+var int a;
+
+fun void cuadrado(int x)
+  var int z;
+  z = x*x;
+  print(z);
+  return()
+endfun
+
+fun int cuadra(int x)
+  var int z;
+  z = x*x;
+  return(z)
+endfun
+
+fun void main()
+  var int x,y;
+  var bool z;
+  x = 5;
+  cuadrado(x);
+  y = cuadra(33);
+  print(3);
+  return()
+
+endfun

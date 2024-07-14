@@ -1,0 +1,46 @@
+start: skip
+enter 1
+alloc 1
+mark
+pusha Lmain
+call
+halt
+Lcuadrado: skip
+enter 2
+alloc 1
+loadr -3
+loadr -3
+mul
+storer 1
+loadr 1
+print
+return 4
+Lcuadra: skip
+enter 2
+alloc 1
+loadr -3
+loadr -3
+mul
+storer 1
+loadr 1
+storer -4
+return 4
+Lmain: skip
+enter 4
+alloc 3
+push  5
+storer 1
+alloc 1
+loadr 1
+mark
+pusha Lcuadrado
+call
+alloc 1
+push  33
+mark
+pusha Lcuadra
+call
+storer 2
+push  3
+print
+return 3
