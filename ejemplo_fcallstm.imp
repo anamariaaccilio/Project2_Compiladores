@@ -1,27 +1,25 @@
-fun int suma(int x)
-  var int accum;
-  accum = 0;
-  print(15);
-  while 0 < x do
-    var int zz;
-    accum = accum + x;
-    x = x - 1
-  endwhile;
-  print(16);
-  return (accum)
+var int a;
+
+fun void cuadrado(int x)
+  var int z;
+  z = x*x;
+  print(z);
+  return()
 endfun
 
-fun void imprime(int x, int y)
-    var int z;
-    z = x + y;
-    print(z);
-    return()
+fun int cuadra(int x)
+  var int z;
+  z = x*x;
+  return(z)
 endfun
 
 fun void main()
-    var int x; 
-    x = 10; 
-    suma(x);
-    imprime(x, x + 10);
-    return()
+  var int x,y;
+  var bool z;
+  x = 5;
+  cuadrado(x);
+  y = cuadra(33);
+  print(3);
+  return()
+
 endfun

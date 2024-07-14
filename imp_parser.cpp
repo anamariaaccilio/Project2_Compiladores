@@ -244,6 +244,7 @@ FunDec* Parser::parseFunDec() {
       if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
       vars.push_back(previous->lexema);
       while(match(Token::COMMA)) {
+        // agregado la condicional del id
         if(!match(Token::ID)) parserError("Expecting type in fun declaration");
 	types.push_back(previous->lexema);
 	if (!match(Token::ID)) parserError("Expecting identifier in fun declaration");
@@ -295,6 +296,7 @@ StatementList* Parser::parseStatementList() {
   id = exp
   print(x)
  */
+
 Stm* Parser::parseStatement() {
   Stm* s = NULL;
   Exp* e = NULL;
