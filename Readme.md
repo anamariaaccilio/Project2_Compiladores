@@ -3,7 +3,7 @@
 ## Integrantes
 
 
-| <a href="https://github.com/anamariaaccilio" target="_blank">*Ana Maria Accilio Villanueva</a> | <a href="https://github.com/YaredRiveros" target="_blank">Yared Riveros Rodriguez</a> | <a href="https://github.com/Angel-Utec" target="_blank">Angel Ulises Tito Berrocal*</a> |
+| <a href="https://github.com/anamariaaccilio" target="_blank">Ana Maria Accilio Villanueva</a> | <a href="https://github.com/YaredRiveros" target="_blank">Yared Riveros Rodriguez</a> | <a href="https://github.com/Angel-Utec" target="_blank">Angel Ulises Tito Berrocal</a> |
 | :----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
 | <img src="https://avatars.githubusercontent.com/u/91237434?v=4" alt="drawing" width="200"/> | <img src="https://avatars.githubusercontent.com/u/83974222?v=4" alt="drawing" width="200"/> | <img src="https://avatars.githubusercontent.com/u/91230666?v=4" alt="drawing" width="200"/> |
 
@@ -270,7 +270,7 @@ Todos los test compilan adecuadamente y con buena presición en los resultados
 
 <div>
 <p style = 'text-align:center;'>
-<img src="./images/image4.png" alt="Ítem2" width="800px">
+<img src="./images/imp_fordo.png" alt="Ítem2" width="800px">
 </p>
 </div>
 
@@ -285,13 +285,14 @@ Dentro de la clase también se agregó los visitor(ImpVisitor, ImpValueVisitor, 
 
 <div>
 <p style = 'text-align:center;'>
-<img src="./images/image4.png" alt="Ítem2" width="800px">
+<img src="./images/for-do-parser.png" alt="Ítem2" width="800px">
 </p>
 </div>
 
 El parser se modificó para reconocer y procesar la nueva sintaxis del bucle for. Los cambios implementados son:
 
-1. Agregado en ParseStatement para aceptar el bucle For-Do:
+#### Agregado en ParseStatement para aceptar el bucle For-Do:
+
 Se agregó lógica para analizar la sintaxis del bucle for en el método parseStatement. Aquí se explica paso a paso:
 
 - Inicio del bucle for:
@@ -314,14 +315,26 @@ Se crea un nuevo nodo ForDoStatement con lo anterior:
 
 s = new ForDoStatement(id, e, e2, tb);
 
-b. Creación de la variable de estado for_stat:
+#### Creación de la variable de estado for_stat:
 Se agregó una variable de estado for_stat en la clase Parser para manejar el estado de la funcion For-Do. Cambiando el valor de 0 a 1 (0 = no esta activo un ForDoStm, 1 = esta activo un ForDoStm).
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/for_stat.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/ID_for-do.png" alt="Ítem2" width="800px">
+</p>
+</div>
 
 ### Printer del ForDoStm:
 
 <div>
 <p style = 'text-align:center;'>
-<img src="./images/image4.png" alt="Ítem2" width="800px">
+<img src="./images/printer-fordo.png" alt="Ítem2" width="800px">
 </p>
 </div>
 
@@ -353,7 +366,7 @@ Una vez que se ha impreso el cuerpo del bucle, el método imprime la palabra end
 
 <div>
 <p style = 'text-align:center;'>
-<img src="./images/image4.png" alt="Ítem2" width="800px">
+<img src="./images/For-do-interpreter.png" alt="Ítem2" width="800px">
 </p>
 </div>
 
@@ -380,7 +393,7 @@ Al final se elimina el nivel creado anteriormente, para no afectar a las otras p
 
 <div>
 <p style = 'text-align:center;'>
-<img src="./images/image4.png" alt="Ítem2" width="800px">
+<img src="./images/codegen_for-do.png" alt="Ítem2" width="800px">
 </p>
 </div>
 
@@ -412,7 +425,7 @@ Se elimina el nivel de direcciones del bucle.
 
 <div>
 <p style = 'text-align:center;'>
-<img src="./images/image4.png" alt="Ítem2" width="800px">
+<img src="./images/typechecker-for.png" alt="Ítem2" width="800px">
 </p>
 </div>
 
@@ -427,3 +440,19 @@ Se verifica que las expresiones e1 y e2 sean de tipo int.
 Se añade un nuevo nivel en el env para la variable de control del bucle.
 Se verifica el cuerpo del bucle.
 Se elimina el nivel en el env al finalizar la verificación.
+
+### Tests
+
+Para verificar la correctitud, usamos el siguiente archivo:
+
+- ejemplo_forfo.imp
+
+lo cual da el siguiente resultado:
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/resultado_for.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+Mostrando la correctitud de la implementación.
