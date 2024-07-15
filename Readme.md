@@ -123,6 +123,11 @@ ArgList ::= CExp (“,” CExp)*
 
 La sentencia FCallStm nos permitirá llamar a funciones respecto a su tipo de retorno. Implica que ajustemos el parser, typechecker y el codegen, de esa forma nos aseguramos que las llamadas a funciones como sentencias sean correctamente validadas.
 
+### Definiciones teóricas codegen y tcheck
+
+![Imagen de WhatsApp 2024-07-14 a las 23 46 17_85b4c101](https://github.com/user-attachments/assets/99200fdf-aa3a-40e8-b437-329919871b99)
+
+
 ### Cambios realizados:
 
 ### 1. Parser
@@ -265,6 +270,13 @@ Gestionar la pila de ejecución, asegurar que los argumentos se pasen correctame
 Todos los test compilan adecuadamente y con buena presición en los resultados.
 
 ## Item 3: Implementar ForDoStm
+
+### Definiciones teóricas codegen y tcheck
+
+![Imagen de WhatsApp 2024-07-14 a las 23 46 17_46b9f43d](https://github.com/user-attachments/assets/1fd6d377-99d4-4af2-bbdc-9b890642b70b)
+
+![Imagen de WhatsApp 2024-07-14 a las 23 46 17_ac6bd2ac](https://github.com/user-attachments/assets/1700ea30-0845-4054-8511-6d38b805fdc5)
+
 
 ### Integración de ForDoStm al imp.cpp y cambios en el parser:
 
