@@ -41,6 +41,4 @@ mark
 pusha Lcuadra
 call
 storer 2
-push  3
-print
 return 3

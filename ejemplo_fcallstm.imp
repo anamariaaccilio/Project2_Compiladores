@@ -19,7 +19,6 @@ fun void main()
   x = 5;
   cuadrado(x);
   y = cuadra(33);
-  print(3);
   return()
 
 endfun

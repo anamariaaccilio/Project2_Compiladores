@@ -1,9 +1,6 @@
 fun void main()
-  var int z;
-  z = 15;
   for z in (5,8) do
     print(z)
   endfor;
-  print(z);
   return ()
 endfun

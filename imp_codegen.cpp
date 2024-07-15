@@ -223,6 +223,9 @@ void ImpCodeGen::visit(ForDoStatement* s) {
     string l2 = next_label();
     string l3 = next_label();
 
+    //alloc 1
+    codegen(nolabel, "alloc", 1);
+
     // Añadir nuevo nivel de direcciones para el bucle for
     direcciones.add_level();
 

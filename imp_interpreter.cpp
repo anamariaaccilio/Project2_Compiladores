@@ -201,6 +201,9 @@ void ImpInterpreter::visit(FCallStm* s) {
     }
     env.add_var(*varit, v);
   }
+  //ejecutar body
+  fdec->body->accept(this);
+
   retcall = false;
   env.remove_level();
   
