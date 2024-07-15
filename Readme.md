@@ -263,3 +263,167 @@ Gestionar la pila de ejecución, asegurar que los argumentos se pasen correctame
 ### Test 
 
 Todos los test compilan adecuadamente y con buena presición en los resultados.
+
+## Item 3: Implementar ForDoStm
+
+### Integración de ForDoStm al imp.cpp y cambios en el parser:
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/image4.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+Se creó una nueva clase ForDoStatement que representa el bucle for-do y contiene los siguientes miembros:
+
+- IdExp* id: El identificador que se utilizará como variable de control del bucle.
+- Exp* e1: La expresión inicial del rango del bucle.
+- Exp* e2: La expresión final del rango del bucle.
+- Body* body: El cuerpo del bucle, que se ejecutará en cada iteración.
+
+Dentro de la clase también se agregó los visitor(ImpVisitor, ImpValueVisitor, TypeVisitor), para el correcto funcionamiento de esta.
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/image4.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+El parser se modificó para reconocer y procesar la nueva sintaxis del bucle for. Los cambios implementados son:
+
+1. Agregado en ParseStatement para aceptar el bucle For-Do:
+Se agregó lógica para analizar la sintaxis del bucle for en el método parseStatement. Aquí se explica paso a paso:
+
+- Inicio del bucle for:
+
+Cuando se encuentra la palabra clave FOR, se inicia el análisis del bucle for.
+Se verifica que el siguiente token sea un identificador (ID), que será la variable de control del bucle, y se guarda en id.
+
+- Expresiones del rango:
+
+Después de la palabra clave IN, se espera un paréntesis izquierdo (.
+Se analiza la expresión inicial e1 y la expresión final e2, separadas por una coma ,.
+Se espera un paréntesis derecho ) para cerrar la definición del rango.
+
+- Cuerpo del bucle:
+
+Después de la palabra clave DO, se analiza el cuerpo del bucle (Body* tb).
+Se espera la palabra clave ENDFOR para finalizar el bucle.
+
+Se crea un nuevo nodo ForDoStatement con lo anterior:
+
+s = new ForDoStatement(id, e, e2, tb);
+
+b. Creación de la variable de estado for_stat:
+Se agregó una variable de estado for_stat en la clase Parser para manejar el estado de la funcion For-Do. Cambiando el valor de 0 a 1 (0 = no esta activo un ForDoStm, 1 = esta activo un ForDoStm).
+
+### Printer del ForDoStm:
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/image4.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+Este método se encarga de imprimir la representación en consola del bucle for.
+
+- Inicio del bucle for:
+
+El método empieza imprimiendo la palabra clave for para indicar el inicio de un bucle for.
+
+- Variable de control del bucle:
+
+Luego, imprime el nombre de la variable que controla el bucle. Esta es la variable que se va a inicializar y que se incrementará en cada iteración del bucle.
+
+- Rango del bucle:
+
+El método imprime la palabra in seguida de un paréntesis "(".
+Después imprime la expresión que define el valor inicial del rango (donde comienza el bucle), luego imprimir una coma, imprime la expresión que define el valor final del rango (donde termina el bucle).
+Finalmente, cierra el paréntesis y añade la palabra do para indicar el inicio del cuerpo del bucle.
+
+- Cuerpo del bucle:
+
+Imprime el cuerpo del bucle, que es el conjunto de instrucciones que se ejecutarán en cada iteración del bucle.
+
+- Final del bucle:
+
+Una vez que se ha impreso el cuerpo del bucle, el método imprime la palabra endfor para indicar el final del bucle for.
+
+### Cambios en ImpInterpreter:
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/image4.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+El método visit(ForDoStatement* s) en ImpInterpreter realiza los siguientes pasos:
+
+- Evaluación de las expresiones de rango:
+
+Se evalúan las expresiones e1 y e2 para obtener los valores inicial y final del rango.
+Se verifica que ambas expresiones sean de tipo int.
+
+- Verificación del rango:
+
+Si el valor inicial es mayor que el valor final, se produce un error.
+
+- Ejecución del bucle:
+
+Se añade un nuevo nivel dentro del env, para diferencias las variables del bucle de las variables locales y globales.
+Se inicializa la variable de control del bucle y se ejecuta el cuerpo del bucle para cada valor en el rango.
+Si se encuentra una declaración return en el cuerpo del bucle, se interrumpe la ejecución del bucle.
+
+Al final se elimina el nivel creado anteriormente, para no afectar a las otras partes del código.
+
+### Cambios en ImpCodeGen:
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/image4.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+El método visit(ForDoStatement* s) en ImpCodeGen realiza los siguientes pasos:
+
+- Inicialización del bucle:
+
+Se generan etiquetas para el inicio (l1), el final (l2) y la condición (l3) del bucle.
+Tambien se hace que siempre tenga un espacio más en el stack para guardar el valor de la variable "id" que se genera en el bucle ForDo, ya que necesitamos un espacio para guardar el valor que se usará dentro del bucle.
+Se añade un nuevo nivel de direcciones para la variable de control del bucle.
+Se genera código para inicializar el contador del bucle.
+
+- Condición del bucle:
+
+Se genera código para evaluar la condición del bucle (contador <= límite).
+Si la condición es falsa, se salta al final del bucle (l2).
+
+- Ejecución del cuerpo del bucle:
+
+Se genera código para ejecutar el cuerpo del bucle.
+Se incrementa el contador y se vuelve al inicio del bucle (l1).
+
+- Finalización del bucle:
+
+Se genera código para el final del bucle (l2).
+Se elimina el nivel de direcciones del bucle.
+
+### Cambios en ImpTypeChecker:
+
+<div>
+<p style = 'text-align:center;'>
+<img src="./images/image4.png" alt="Ítem2" width="800px">
+</p>
+</div>
+
+El método visit(ForDoStatement* s) en ImpTypeChecker realiza los siguientes pasos:
+
+- Verificación de Tipos de las Expresiones de Rango:
+
+Se verifica que las expresiones e1 y e2 sean de tipo int.
+
+- Bucle:
+
+Se añade un nuevo nivel en el env para la variable de control del bucle.
+Se verifica el cuerpo del bucle.
+Se elimina el nivel en el env al finalizar la verificación.
